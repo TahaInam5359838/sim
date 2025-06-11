@@ -45,12 +45,23 @@ def generate_launch_description():
         condition=IfCondition(LaunchConfiguration('gui'))
     )
 
+    cam_xacro_file = os.path.join(pkg_path,'urdf','camera.urdf.xacro')
+    cam_robot_description_config = xacro.process_file(cam_xacro_file)
+    cam_pub = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='camera_state_publisher',
+        parameters=[{'robot_description': cam_robot_description_config.toxml(), 'use_sim_time': use_sim_time}],
+        output='screen'
+    )
+
 
     # Launch!
     return LaunchDescription([
         DeclareLaunchArgument('use_sim_time', default_value='false', description='Use sim time if true'),
         DeclareLaunchArgument('gui', default_value='false', description='Use joint state publisher gui if true'), 
         node_robot_state_publisher,
+        #cam_pub,
         # joint_state_publisher_node,
         # joint_state_publisher_gui_node
     ])
