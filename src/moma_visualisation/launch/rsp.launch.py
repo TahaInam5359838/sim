@@ -48,14 +48,8 @@ def generate_launch_description():
 
     # Launch!
     return LaunchDescription([
-        DeclareLaunchArgument(
-            'use_sim_time',
-            default_value='false',
-            description='Use sim time if true'),
-        DeclareLaunchArgument(
-        'gui',
-        default_value='false',
-        description='Use joint state publisher gui if true'),
+        DeclareLaunchArgument('use_sim_time', default_value='false', description='Use sim time if true'),
+        DeclareLaunchArgument('gui', default_value='false', description='Use joint state publisher gui if true'), 
         node_robot_state_publisher,
         # joint_state_publisher_node,
         # joint_state_publisher_gui_node

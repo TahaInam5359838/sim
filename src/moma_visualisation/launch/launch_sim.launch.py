@@ -17,35 +17,35 @@ def generate_launch_description():
 
 
     # Include the robot_state_publisher launch file, provided by our own package. Force sim time to be enabled
-    # !!! MAKE SURE YOU SET THE PACKAGE NAME CORRECTLY !!!
-
-    package_name='moma_visualisation' #<--- CHANGE ME
+    package_name = 'moma_visualisation'
     pkg_path = os.path.join(get_package_share_directory(package_name))
     rsp = IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([os.path.join(
-                    pkg_path,'launch','rsp.launch.py'
-                )]), launch_arguments={'use_sim_time': 'true'}.items()
+            PythonLaunchDescriptionSource([os.path.join(pkg_path, 'launch', 'rsp.launch.py')]), 
+            launch_arguments={'use_sim_time': 'true'}.items()
     )
 
 
-    # # Include the Gazebo launch file, provided by the gazebo_ros package
+    # Include the Gazebo launch file, provided by the gazebo_ros package
     gazebo = IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([os.path.join(
-                    get_package_share_directory('ros_gz_sim'), 'launch', 'gz_sim.launch.py')]), launch_arguments={"gz_args":[' -r '+ os.path.join(pkg_path,'worlds','obstacles.sdf')]}.items(),
-                    condition=UnlessCondition(LaunchConfiguration('no_gazebo')))
+                PythonLaunchDescriptionSource([os.path.join(get_package_share_directory('ros_gz_sim'), 'launch', 'gz_sim.launch.py')]),
+                launch_arguments={"gz_args":[' -r '+ os.path.join(pkg_path,'worlds','obstacles.sdf')]}.items(),
+                condition=UnlessCondition(LaunchConfiguration('no_gazebo'))
+    )
     
+    # Launch SLAM toolbox
     slam_toolbox = IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([os.path.join(
-                    get_package_share_directory('slam_toolbox'), 'launch', 'online_async_launch.py')]), launch_arguments={'slam_params_file': [os.path.join(pkg_path, 'config', 'mapper_params_online_async.yaml'),], 'use_sim_time':['true',]}.items(),
-                )
+                PythonLaunchDescriptionSource([os.path.join(get_package_share_directory('slam_toolbox'), 'launch', 'online_async_launch.py')]), 
+                launch_arguments={'slam_params_file': [os.path.join(pkg_path, 'config', 'mapper_params_online_async.yaml'),], 
+                                  'use_sim_time':['true',],}.items()
+    )
     
+    # Launch Nav2 stack
     nav2 = IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([os.path.join(
-                    pkg_path,'launch','navigation.launch.py'
-                )]), launch_arguments={'use_sim_time': 'true'}.items()
+            PythonLaunchDescriptionSource([os.path.join(pkg_path,'launch','navigation.launch.py')]), 
+            launch_arguments={'use_sim_time': 'true'}.items()
     )
 
-    
+    # Spawn the robot in Gazebo
     spawn_entity = Node(
         package='ros_gz_sim',
         executable='create',
@@ -54,24 +54,25 @@ def generate_launch_description():
         output='screen'
     )
 
+    # Joint State Broadcaster
     load_joint_state_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'joint_state_broadcaster'],
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 'joint_state_broadcaster'],
         output='screen'
     )
 
+    # Base controller
     load_diff_drive_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'diff_drive_base_controller'],
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 'diff_drive_base_controller'],
         output='screen'
     )
 
+    # Robot arm controller
     load_arm_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'arm_controller'],
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 'arm_controller'],
         output='screen'
     )
 
+    # Send controlled base velocity to gazebo
     cmd_vel_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -80,6 +81,7 @@ def generate_launch_description():
         output='screen'
     )
 
+    # Send commanded base velocity to gazebo
     cmd_vel_gazebo_internal_teleop_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -89,6 +91,7 @@ def generate_launch_description():
         ros_arguments=['-r', '/cmd_vel:=/diff_drive_base_controller/cmd_vel_unstamped']
     )
 
+    # Send Lidar scans to gazebo
     amr_lidar_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -97,6 +100,7 @@ def generate_launch_description():
         output='screen'
     )
 
+    # Send odom to gazebo
     odom_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -105,7 +109,7 @@ def generate_launch_description():
         output='screen'
     )
 
-    # Bridge
+    # Bridge for clock
     clock_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -123,13 +127,9 @@ def generate_launch_description():
     )
     
     
-    # Launch them all!
+    # Launch them all
     return LaunchDescription([
-        
-        DeclareLaunchArgument(
-            'no_gazebo',
-            default_value='false',
-            description='Prevents the launch of Gazebo if True'),
+        DeclareLaunchArgument('no_gazebo', default_value='false', description='Prevents the launch of Gazebo if True'),
         clock_bridge,
         amr_lidar_bridge,
         odom_bridge,
@@ -152,5 +152,4 @@ def generate_launch_description():
             )
         ),
         spawn_entity,
-        
     ])
