@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<robot name="AMR_Platform"
+    xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="lidar_inertial_cylinder" params="mass length radius *origin">
+        <inertial>
+            <xacro:insert_block name="origin"/>
+            <mass value="${mass}" />
+            <inertia ixx="${(1/12) * mass * (3*radius*radius + length*length)}" ixy="0.0" ixz="0.0"
+                    iyy="${(1/12) * mass * (3*radius*radius + length*length)}" iyz="0.0"
+                    izz="${(1/2) * mass * (radius*radius)}" />
+        </inertial>
+    </xacro:macro>
+    <material name="amr_laser_red">
+        <color rgba="1 0 0 1"/>
+    </material>
+   
+    <link name="amr_lidar_body">
+        <visual>
+            <geometry>
+                <cylinder length="0.004" radius="0.007"/>
+            </geometry>
+            <material name="amr_laser_red"/>
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder length="0.0000001" radius="0.0000001"/>
+            </geometry>
+        </collision>
+        <xacro:lidar_inertial_cylinder mass="0.1" length="0.004" radius="0.007">
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:lidar_inertial_cylinder>
+    </link>
+    
+    <gazebo reference="amr_lidar_body">
+        <material>Gazebo/Red</material>
+        <sensor name="amr_laser" type="gpu_lidar">
+            <ignition_frame_id>amr_lidar_body</ignition_frame_id>
+            <frame_id>amr_lidar_body</frame_id>
+            <pose>0 0 0 0 0 0</pose>
+            <topic>amr_laser/scan</topic>
+            <update_rate>20</update_rate>
+            <lidar>
+                <scan>
+                    <horizontal>
+                        <samples>320</samples>
+                        <resolution>1</resolution>
+                        <min_angle>-1.396263</min_angle>
+                        <max_angle>1.396263</max_angle>
+                    </horizontal>
+                    <vertical>
+                        <samples>1</samples>
+                        <resolution>0.01</resolution>
+                        <min_angle>0</min_angle>
+                        <max_angle>0</max_angle>
+                    </vertical>
+                </scan>
+                <range>
+                    <min>0.08</min>
+                    <max>10.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+                <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.001</stddev>
+                </noise>
+            </lidar>
+            <always_on>1</always_on>
+            <visualize>true</visualize>
+            <plugin filename="libignition-gazebo-sensors-system.so" name="ignition::gazebo::systems::Sensors">
+                <render_engine>ogre2</render_engine>
+                <frame_name>amr_lidar_body</frame_name>
+            </plugin>
+        </sensor>
+    </gazebo>
+</robot>

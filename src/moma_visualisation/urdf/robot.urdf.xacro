@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot">
+
+    
+
+    <xacro:include filename="amr_core.xacro" />
+    <xacro:include filename="chassis_core.xacro" />
+    <xacro:include filename="amr_lidar.xacro" />
+    <xacro:include filename="tm12s_core.xacro" />
+
+    <joint name="lidar_joint" type="fixed">
+        <parent link="amr_main_body"/>
+        <child link="amr_lidar_body"/>
+        <origin xyz="0.35 0 0.1"/>
+    </joint>
+    <joint name="chassis_connector" type="fixed">
+        <axis rpy="0 0 1.57" xyz="0 0 0.5"/>
+        <parent link="amr_main_body"/>
+        <child link="chassis"/>
+    </joint>
+
+    <joint name="tm12s_base_fixed_joint" type="fixed">
+        <parent link="chassis" />
+        <child link="link_0" />
+        <origin xyz="-0.25 0 0.73" rpy="0 0 1.5708" />
+    </joint>
+
+    <link name="base_footprint">
+    </link>
+    <joint name="base_footprint_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="base_footprint" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
+    <xacro:include filename="gazebo_control.xacro"/>
+</robot>

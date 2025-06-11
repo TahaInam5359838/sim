@@ -1,0 +1,350 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="macro.inertial.xacro" />
+
+  <xacro:macro name="tm12s" params="ns prefix color:=none format:=obj joint_1_lower_limit:=${radians(-360)} joint_1_upper_limit:=${radians(360)} joint_2_lower_limit:=${radians(-360)} joint_2_upper_limit:=${radians(360)} joint_3_lower_limit:=${radians(-162)} joint_3_upper_limit:=${radians(162)} joint_4_lower_limit:=${radians(-360)} joint_4_upper_limit:=${radians(360)} joint_5_lower_limit:=${radians(-360)} joint_5_upper_limit:=${radians(360)} joint_6_lower_limit:=${radians(-360)} joint_6_upper_limit:=${radians(360)} joint_1_velocity_limit:=${radians(130)} joint_2_velocity_limit:=${radians(130)} joint_3_velocity_limit:=${radians(210)} joint_4_velocity_limit:=${radians(225)} joint_5_velocity_limit:=${radians(225)} joint_6_velocity_limit:=${radians(450)} joint_1_effort_limit:=${350} joint_2_effort_limit:=${350} joint_3_effort_limit:=${170} joint_4_effort_limit:=${45} joint_5_effort_limit:=${45} joint_6_effort_limit:=${45} safety_limits:=false safety_pos_margin:=0.15 safety_k_position:=20">
+
+    <xacro:property name="damping_factor" value="0.000"/>
+    <xacro:property name="d1" value="${damping_factor*0.1}"/>
+    <xacro:property name="d2" value="${damping_factor*0.1}"/>
+    <xacro:property name="d3" value="${damping_factor*0.1}"/>
+    <xacro:property name="d4" value="${damping_factor*0.1}"/>
+    <xacro:property name="d5" value="${damping_factor*0.1}"/>
+    <xacro:property name="d6" value="${damping_factor*0.1}"/>
+
+    <xacro:property name="friction_factor" value="0.000"/>
+    <xacro:property name="f1" value="${friction_factor*0.1}"/>
+    <xacro:property name="f2" value="${friction_factor*0.1}"/>
+    <xacro:property name="f3" value="${friction_factor*0.1}"/>
+    <xacro:property name="f4" value="${friction_factor*0.1}"/>
+    <xacro:property name="f5" value="${friction_factor*0.1}"/>
+    <xacro:property name="f6" value="${friction_factor*0.1}"/>
+
+    <!-- Inertia parameters -->
+    <xacro:property name="mass_0" value="1.0" />
+    <xacro:property name="mass_1" value="8.200" />
+    <xacro:property name="mass_2" value="15.017" />
+    <xacro:property name="mass_3" value="3.329" />
+    <xacro:property name="mass_4" value="1.770" />
+    <xacro:property name="mass_5" value="1.880" />
+    <xacro:property name="mass_6" value="0.720" />
+
+    <xacro:property name="unit_factor" value="0.000001"/>
+    <xacro:property name="ixx_1" value="${25963.078*unit_factor}" />
+    <xacro:property name="ixx_2" value="${56178.979*unit_factor}" />
+    <xacro:property name="ixx_3" value="${4694.5431*unit_factor}" />
+    <xacro:property name="ixx_4" value="${2046.0318*unit_factor}" />
+    <xacro:property name="ixx_5" value="${2046.0318*unit_factor}" />
+    <xacro:property name="ixx_6" value="${703.44734*unit_factor}" />
+
+    <xacro:property name="iyy_1" value="${37671.229*unit_factor}" />
+    <xacro:property name="iyy_2" value="${1212610.4*unit_factor}" />
+    <xacro:property name="iyy_3" value="${134098.54*unit_factor}" />
+    <xacro:property name="iyy_4" value="${3171.8293*unit_factor}" />
+    <xacro:property name="iyy_5" value="${3171.8293*unit_factor}" />
+    <xacro:property name="iyy_6" value="${1711.0225*unit_factor}" />
+
+    <xacro:property name="izz_1" value="${38856.370*unit_factor}" />
+    <xacro:property name="izz_2" value="${1231270.0*unit_factor}" />
+    <xacro:property name="izz_3" value="${135525.91*unit_factor}" />
+    <xacro:property name="izz_4" value="${3478.9518*unit_factor}" />
+    <xacro:property name="izz_5" value="${3478.9518*unit_factor}" />
+    <xacro:property name="izz_6" value="${1854.4783*unit_factor}" />
+    <!-- ####################################################################################################################################### -->
+    <!-- Link 0-->
+    <link name="${prefix}link_0">
+      <!-- Visual -->
+      <visual>
+        <origin rpy="0.000000 -0.000000 0.000000" xyz="0.000000 0.000000 0.012" />
+        <geometry>
+          <cylinder radius="0.085" length="0.02"/>
+        </geometry>
+        <material name="${color}" />
+      </visual>
+      <!-- Collision -->
+      <collision>
+        <origin rpy="0.000000 -0.000000 0.000000" xyz="0.000000 0.000000 0.012" />
+        <geometry>
+          <cylinder radius="0.085" length="0.02"/>
+        </geometry>
+      </collision>
+      <!-- Inertial -->
+      <xacro:cylinder_inertial_z radius="0.06" length="0.05" mass="${mass_0}">
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.000000" />
+      </xacro:cylinder_inertial_z>
+    </link>
+
+    <!-- Joint 1 -->
+    <joint name="${prefix}joint_1" type="revolute">
+      <parent link="${prefix}link_0" />
+      <child link="${prefix}link_1" />
+      <origin rpy="0.000000 -0.000000 0.000000" xyz="0.000000 0.000000 0.165200" />
+      <axis xyz="0 0 1" />
+      <limit lower="${joint_1_lower_limit}" upper="${joint_1_upper_limit}" velocity="${joint_1_velocity_limit}" effort="${joint_1_effort_limit}" />
+      <xacro:if value="${safety_limits}">
+        <safety_controller soft_lower_limit="${joint_1_lower_limit + safety_pos_margin}" soft_upper_limit="${joint_1_upper_limit - safety_pos_margin}" k_position="${safety_k_position}" k_velocity="0.0" />
+      </xacro:if>
+      <dynamics damping="${d1}" friction="${f1}" />
+    </joint>
+    <!-- ####################################################################################################################################### -->
+    <!-- Link 1 -->
+    <link name="${prefix}link_1">
+      <!-- Visual -->
+      <visual>
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 -0.023" />
+        <geometry>
+          <cylinder radius="0.07" length="0.235"/>
+        </geometry>
+        <material name="${color}" />
+      </visual>
+
+      <!-- Collision -->
+      <collision>
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 -0.023" />
+        <geometry>
+          <cylinder radius="0.07" length="0.235"/>
+        </geometry>
+      </collision>
+      <!-- Inertial -->
+      <inertial>
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.000000" />
+        <mass value="${mass_1}" />
+        <inertia ixx="${ixx_1}" ixy="0.000000" ixz="0.000000" iyy="${iyy_1}" iyz="0.000000" izz="${izz_1}" />
+      </inertial>
+    </link>
+    <!-- Joint 2 -->
+    <joint name="${prefix}joint_2" type="revolute">
+      <parent link="${prefix}link_1" />
+      <child link="${prefix}link_2" />
+      <origin rpy="-1.570796 -1.570796 0.000000" xyz="0.000000 0.000000 0.000000" />
+      <axis xyz="0 0 1" />
+      <limit lower="${joint_2_lower_limit}" upper="${joint_2_upper_limit}" velocity="${joint_2_velocity_limit}" effort="${joint_2_effort_limit}" />
+      <xacro:if value="${safety_limits}">
+        <safety_controller soft_lower_limit="${joint_2_lower_limit + safety_pos_margin}" soft_upper_limit="${joint_2_upper_limit - safety_pos_margin}" k_position="${safety_k_position}" k_velocity="0.0" />
+      </xacro:if>
+      <dynamics damping="${d2}" friction="${f2}" />
+    </joint>
+    <!-- ####################################################################################################################################### -->
+    <!-- Link 2 -->
+    <link name="${prefix}link_2">
+      <!-- Visual -->
+      <visual>
+        <origin rpy="0.000000 1.57079632679 0.000000" xyz="0.330000 0.000000 -0.19" />
+        <geometry>
+          <cylinder radius="0.07" length="0.4875"/>
+        </geometry>
+        <material name="${color}" />
+      </visual>
+      <visual>
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 -0.1825" />
+        <geometry>
+          <cylinder radius="0.085" length="0.22"/>
+        </geometry>
+        <material name="${color}" />
+      </visual>
+      <!-- Collision -->
+      <collision>
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 -0.1825" />
+        <geometry>
+          <cylinder radius="0.085" length="0.22"/>
+        </geometry>
+      </collision>
+      <collision>
+        <origin rpy="0.000000 1.57079632679 0.000000" xyz="0.330000 0.000000 -0.19" />
+        <geometry>
+          <cylinder radius="0.07" length="0.4875"/>
+        </geometry>
+      </collision>
+
+      <!-- Inertial -->
+      <inertial>
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.000000" />
+        <mass value="${mass_2}" />
+        <inertia ixx="${ixx_2}" ixy="0.000000" ixz="0.000000" iyy="${iyy_2}" iyz="0.000000" izz="${izz_2}" />
+      </inertial>
+    </link>
+    <!-- Joint 3 -->
+    <joint name="${prefix}joint_3" type="revolute">
+      <parent link="${prefix}link_2" />
+      <child link="${prefix}link_3" />
+      <origin rpy="0.000000 -0.000000 0.000000" xyz="0.636100 0.000000 0.000000" />
+      <axis xyz="0 0 1" />
+      <limit lower="${joint_3_lower_limit}" upper="${joint_3_upper_limit}" velocity="${joint_3_velocity_limit}" effort="${joint_3_effort_limit}" />
+      <xacro:if value="${safety_limits}">
+        <safety_controller soft_lower_limit="${joint_3_lower_limit + safety_pos_margin}" soft_upper_limit="${joint_3_upper_limit - safety_pos_margin}" k_position="${safety_k_position}" k_velocity="0.0" />
+      </xacro:if>
+      <dynamics damping="${d3}" friction="${f3}" />
+    </joint>
+    <!-- ####################################################################################################################################### -->
+    <!-- Link 3 -->
+    <link name="${prefix}link_3">
+      <!-- Visual -->
+      <visual>
+        <material name="${color}" />
+        <origin rpy="0.000000 1.57079632679 0.000000" xyz="0.21 0.000000 -0.04" />
+        <geometry>
+          <cylinder radius="0.05" length="0.54"/>
+        </geometry>
+      </visual>
+      <visual>
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 -0.1825" />
+        <geometry>
+          <cylinder radius="0.062" length="0.18"/>
+        </geometry>
+        <material name="${color}" />
+      </visual>
+      <!-- Collision -->
+      <collision>
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 -0.1825" />
+        <geometry>
+          <cylinder radius="0.062" length="0.18"/>
+        </geometry>
+      </collision>
+      <collision>
+        <origin rpy="0.000000 1.57079632679 0.000000" xyz="0.21 0.000000 -0.04" />
+        <geometry>
+          <cylinder radius="0.05" length="0.54"/>
+        </geometry>
+      </collision>
+      <!-- Inertial -->
+      <inertial>
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.000000" />
+        <mass value="${mass_3}" />
+        <inertia ixx="${ixx_3}" ixy="0.000000" ixz="0.000000" iyy="${iyy_3}" iyz="0.000000" izz="${izz_3}" />
+      </inertial>
+    </link>
+    <!-- Joint 4 -->
+    <joint name="${prefix}joint_4" type="revolute">
+      <parent link="${prefix}link_3" />
+      <child link="${prefix}link_4" />
+      <origin rpy="0.000000 -0.000000 1.570796" xyz="0.532400 0.000000 -0.181800" />
+      <axis xyz="0 0 1" />
+      <limit lower="${joint_4_lower_limit}" upper="${joint_4_upper_limit}" velocity="${joint_4_velocity_limit}" effort="${joint_4_effort_limit}" />
+      <xacro:if value="${safety_limits}">
+        <safety_controller soft_lower_limit="${joint_4_lower_limit + safety_pos_margin}" soft_upper_limit="${joint_4_upper_limit - safety_pos_margin}" k_position="${safety_k_position}" k_velocity="0.0" />
+      </xacro:if>
+      <dynamics damping="${d4}" friction="${f4}" />
+    </joint>
+    <!-- ####################################################################################################################################### -->
+    <!-- Link 4 -->
+    <link name="${prefix}link_4">
+      <!-- Visual -->
+      <visual>
+        <origin rpy="1.57079632679 0.000000 0.000000" xyz="0.000000 -0.00800 -0.001" />
+        <geometry>
+          <cylinder radius="0.05" length="0.14"/>
+        </geometry>
+        <material name="${color}" />
+      </visual>
+      <visual>
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.12" />
+        <geometry>
+          <cylinder radius="0.05" length="0.14"/>
+        </geometry>
+        <material name="${color}" />
+      </visual>
+      <!-- Collision -->
+      <collision>
+        <origin rpy="1.57079632679 0.000000 0.000000" xyz="0.000000 -0.00800 -0.001" />
+        <geometry>
+          <cylinder radius="0.05" length="0.14"/>
+        </geometry>
+      </collision>
+      <collision>
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.12" />
+        <geometry>
+          <cylinder radius="0.05" length="0.14"/>
+        </geometry>
+      </collision>
+      <!-- Inertial -->
+      <inertial>
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.000000" />
+        <mass value="${mass_4}" />
+        <inertia ixx="${ixx_4}" ixy="0.000000" ixz="0.000000" iyy="${iyy_4}" iyz="0.000000" izz="${izz_4}" />
+      </inertial>
+    </link>
+    <!-- Joint 5 -->
+    <joint name="${prefix}joint_5" type="revolute">
+      <parent link="${prefix}link_4" />
+      <child link="${prefix}link_5" />
+      <origin rpy="1.570796 -0.000000 0.000000" xyz="0.000000 -0.131500 0.000000" />
+      <axis xyz="0 0 1" />
+      <limit lower="${joint_5_lower_limit}" upper="${joint_5_upper_limit}" velocity="${joint_5_velocity_limit}" effort="${joint_5_effort_limit}" />
+      <xacro:if value="${safety_limits}">
+        <safety_controller soft_lower_limit="${joint_5_lower_limit + safety_pos_margin}" soft_upper_limit="${joint_5_upper_limit - safety_pos_margin}" k_position="${safety_k_position}" k_velocity="0.0" />
+      </xacro:if>
+      <dynamics damping="${d5}" friction="${f5}" />
+    </joint>
+    <!-- ####################################################################################################################################### -->
+    <!-- Link 5 -->
+    <link name="${prefix}link_5">
+      <!-- Visual -->
+      <visual>
+        <origin rpy="1.57079632679 0.000000 0.000000" xyz="0.000000 0.000000 -0.005" />
+        <geometry>
+          <cylinder radius="0.048" length="0.14"/>
+        </geometry>
+        <material name="${color}" />
+      </visual>
+      <!-- Collision -->
+      <collision>
+        <origin rpy="1.57079632679 0.000000 0.000000" xyz="0.000000 -0.030000 -0.005" />
+        <geometry>
+          <cylinder radius="0.048" length="0.18"/>
+        </geometry>
+      </collision>
+      <!-- Inertial -->
+      <inertial>
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.000000" />
+        <mass value="${mass_5}" />
+        <inertia ixx="${ixx_5}" ixy="0.000000" ixz="0.000000" iyy="${iyy_5}" iyz="0.000000" izz="${izz_5}" />
+      </inertial>
+    </link>
+    <!-- Joint 6 -->
+    <joint name="${prefix}joint_6" type="revolute">
+      <parent link="${prefix}link_5" />
+      <child link="${prefix}link_6" />
+      <origin rpy="1.570796 -0.000000 0.000000" xyz="0.000000 -0.134950 0.000000" />
+      <axis xyz="0 0 1" />
+      <limit lower="${joint_6_lower_limit}" upper="${joint_6_upper_limit}" velocity="${joint_6_velocity_limit}" effort="${joint_6_effort_limit}" />
+      <xacro:if value="${safety_limits}">
+        <safety_controller soft_lower_limit="${joint_6_lower_limit + safety_pos_margin}" soft_upper_limit="${joint_6_upper_limit - safety_pos_margin}" k_position="${safety_k_position}" k_velocity="0.0" />
+      </xacro:if>
+      <dynamics damping="${d6}" friction="${f6}" />
+    </joint>
+    <!-- ####################################################################################################################################### -->
+    <!-- Link 6 -->
+    <link name="${prefix}link_6">
+      <!-- Visual -->
+      <visual>
+        <geometry>
+          <mesh filename="file://$(find moma_visualisation)/meshes/tm12s-io.${format}" />
+        </geometry>
+        <material name="${color}" />
+      </visual>
+      <!-- Collision -->
+      <collision>
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.080000 0" />
+        <geometry>
+          <cylinder radius="0.03" length="0.13"/>
+        </geometry>
+      </collision>
+      <!-- Inertial -->
+      <inertial>
+        <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.000000" />
+        <mass value="${mass_6}" />
+        <inertia ixx="${ixx_6}" ixy="0.000000" ixz="0.000000" iyy="${iyy_6}" iyz="0.000000" izz="${izz_6}" />
+      </inertial>
+    </link>
+
+    <link name="${prefix}flange" />
+    <!-- Joint -->
+    <joint name="${prefix}flange_fixed_joint" type="fixed">
+      <parent link="${prefix}link_6" />
+      <child link="${prefix}flange" />
+      <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.000000" />
+    </joint>
+    <!--LinkDescription-->
+  </xacro:macro>
+</robot>
