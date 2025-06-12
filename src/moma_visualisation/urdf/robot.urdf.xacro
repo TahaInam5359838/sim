@@ -34,9 +34,9 @@
     </joint>
 
     <joint name="camera_joint" type="fixed">
-        <parent link="link_6"/>
+        <parent link="flange"/>
         <child link="camera_link"/>
-        <origin xyz="0.305 0 0.08" rpy="0 0 0"/>
+        <origin xyz="0 0.08 0.05" rpy="0 -1.5707 0"/>
     </joint>
  
     <link name="camera_link">
