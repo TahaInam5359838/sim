@@ -33,20 +33,5 @@
         <origin xyz="0 0 0" rpy="0 0 0" />
     </joint>
 
-    <joint name="camera_joint" type="fixed">
-        <parent link="flange"/>
-        <child link="camera_link"/>
-        <origin xyz="0 0.08 0.05" rpy="-1.5707 -1.5707 0"/>
-    </joint>
- 
-    <link name="camera_link">
-        <visual>
-            <geometry>
-                <box size="0.010 0.03 0.03"/>
-            </geometry>
-            <material name="red"/>
-        </visual>
-    </link>
-
     <xacro:include filename="gazebo_control.xacro"/>
 </robot>

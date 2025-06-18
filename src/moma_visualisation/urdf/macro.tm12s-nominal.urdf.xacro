@@ -338,6 +338,23 @@
       </inertial>
     </link>
 
+    <!-- RGBD Camera -->
+    <joint name="camera_joint" type="fixed">
+        <parent link="${prefix}link_6"/>
+        <child link="${prefix}camera_link"/>
+        <origin xyz="0 0.08 0.05" rpy="-1.5707 -1.5707 0"/>
+    </joint>
+    
+    <link name="${prefix}camera_link">
+        <visual>
+            <geometry>
+                <box size="0.010 0.03 0.03"/>
+            </geometry>
+            <material name="red"/>
+        </visual>
+        <static>true</static>
+    </link>
+
     <link name="${prefix}flange" />
     <!-- Joint -->
     <joint name="${prefix}flange_fixed_joint" type="fixed">

@@ -46,18 +46,47 @@ def generate_launch_description():
     )
 
     # Bridge
+    # bridge = Node(
+    #     package='ros_gz_bridge',
+    #     executable='parameter_bridge',
+    #     arguments=[#'/test/integration/CameraPlugin_imagesWithBuiltinSDF@sensor_msgs/msg/Image@gz.msgs.Image',
+    #                '/depth_camera@sensor_msgs/msg/Image@gz.msgs.Image',
+    #                '/depth_camera/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked'],
+    #     output='screen'
+    # )
+
+    # bridge = Node(
+    #     package='ros_gz_bridge',
+    #     executable='parameter_bridge',
+    #     arguments=['/depth_camera@sensor_msgs/msg/Image@gz.msgs.Image'],
+    #     output='screen'
+    # )
+
+    bridge = Node(
+        package='ros_gz_image',
+        executable='image_bridge',
+        arguments=['camera', 'depth_camera', 'rgbd_camera/image', 'rgbd_camera/depth_image'],
+        output='screen'
+    )
+
     bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
-        arguments=['/test/integration/CameraPlugin_imagesWithBuiltinSDF@sensor_msgs/msg/Image@gz.msgs.Image',
-                   '/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo'],
+        arguments=[             # ign topic -t <topic_name> --info
+            '/depth_camera/points@sensor_msgs/msg/PointCloud2@ignition.msgs.PointCloudPacked',
+            '/depth_camera/camera_info@sensor_msgs/msg/CameraInfo@ignition.msgs.CameraInfo',
+            '/depth_camera/image@sensor_msgs/msg/Image@ignition.msgs.Image',
+        ],
         output='screen'
     )
 
     return LaunchDescription([
+        DeclareLaunchArgument('use_sim_time', default_value=['true'],
+                            description='use sim time from /clock'),    
         DeclareLaunchArgument('rviz', default_value='true',
                               description='Open RViz.'),
         #gz_sim,
         bridge,
-        rviz
+        # dbridge,
+        #rviz
     ])
