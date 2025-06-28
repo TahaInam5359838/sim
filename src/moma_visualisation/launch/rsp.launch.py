@@ -20,6 +20,7 @@ def generate_launch_description():
     # Process the URDF file
     pkg_path = os.path.join(get_package_share_directory('moma_visualisation'))
     xacro_file = os.path.join(pkg_path,'urdf','robot.urdf.xacro')
+    #xacro_file = os.path.join(pkg_path,'urdf','robotiq_2f_140_gripper.urdf.xacro')
     robot_description_config = xacro.process_file(xacro_file)
 
     #print(robot_description_config.toxml())

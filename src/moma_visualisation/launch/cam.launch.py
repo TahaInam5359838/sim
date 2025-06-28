@@ -25,25 +25,27 @@ from launch.substitutions import LaunchConfiguration
 
 from launch_ros.actions import Node
 
+from moveit_configs_utils import MoveItConfigsBuilder
+
 
 def generate_launch_description():
 
     pkg_ros_gz_sim_demos = get_package_share_directory('ros_gz_sim_demos')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
 
-    gz_sim = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
-        launch_arguments={'gz_args': '-r camera_sensor.sdf'}.items(),
-    )
+    # gz_sim = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
+    #     launch_arguments={'gz_args': '-r camera_sensor.sdf'}.items(),
+    # )
 
-    # RViz
-    rviz = Node(
-        package='rviz2',
-        executable='rviz2',
-        arguments=['-d', os.path.join(pkg_ros_gz_sim_demos, 'rviz', 'camera.rviz')],
-        condition=IfCondition(LaunchConfiguration('rviz'))
-    )
+    # # RViz
+    # rviz = Node(
+    #     package='rviz2',
+    #     executable='rviz2',
+    #     arguments=['-d', os.path.join(pkg_ros_gz_sim_demos, 'rviz', 'camera.rviz')],
+    #     condition=IfCondition(LaunchConfiguration('rviz'))
+    # )
 
     # Bridge
     # bridge = Node(
@@ -62,31 +64,79 @@ def generate_launch_description():
     #     output='screen'
     # )
 
-    bridge = Node(
-        package='ros_gz_image',
-        executable='image_bridge',
-        arguments=['camera', 'depth_camera', 'rgbd_camera/image', 'rgbd_camera/depth_image'],
-        output='screen'
+    # bridge = Node(
+    #     package='ros_gz_image',
+    #     executable='image_bridge',
+    #     arguments=['camera', 'depth_camera', 'rgbd_camera/image', 'rgbd_camera/depth_image'],
+    #     output='screen'
+    # )
+
+
+    moveit_config = (
+        MoveItConfigsBuilder("robot", package_name="tm12s_moveit_config")
+        .robot_description(file_path="config/robot.urdf.xacro")
+        .robot_description_semantic(file_path="config/robot.srdf")
+        .trajectory_execution(file_path="config/moveit_controllers.yaml")
+        .robot_description_kinematics(file_path="config/kinematics.yaml")
+        .planning_scene_monitor(
+            publish_robot_description= True, publish_robot_description_semantic=True, publish_planning_scene=True
+        )
+        .planning_pipelines(
+            pipelines=["ompl"]
+        )
+        .to_moveit_configs()
     )
 
-    bridge = Node(
-        package='ros_gz_bridge',
-        executable='parameter_bridge',
-        arguments=[             # ign topic -t <topic_name> --info
-            '/depth_camera/points@sensor_msgs/msg/PointCloud2@ignition.msgs.PointCloudPacked',
-            '/depth_camera/camera_info@sensor_msgs/msg/CameraInfo@ignition.msgs.CameraInfo',
-            '/depth_camera/image@sensor_msgs/msg/Image@ignition.msgs.Image',
-        ],
-        output='screen'
+    rviz_config_path = os.path.join(
+        get_package_share_directory("tm12s_moveit_config"),
+        "config",
+        "moveit.rviz",
     )
+
+    rviz_node = Node(
+        package="rviz2",
+        executable="rviz2",
+        name="rviz2",
+        output="screen",
+        arguments=["-d", rviz_config_path],
+        parameters=[
+            moveit_config.robot_description,
+            moveit_config.robot_description_semantic,
+            moveit_config.planning_pipelines,
+            moveit_config.robot_description_kinematics,
+        ],
+    )
+
+    ompl_yaml_path = os.path.join(
+        get_package_share_directory("tm12s_moveit_config"),
+        "config",
+        "moveit_planners_ompl.yaml",
+    )
+
+    move_group_node = Node(
+        package="moveit_ros_move_group",
+        executable="move_group",
+        output="screen",
+        parameters=[
+            moveit_config.to_dict(),
+            {"use_sim_time": True},
+            ompl_yaml_path,
+        ],
+        arguments=["--ros-args", "--log-level", "info"],
+    )
+
+    
+
+    
 
     return LaunchDescription([
-        DeclareLaunchArgument('use_sim_time', default_value=['true'],
-                            description='use sim time from /clock'),    
-        DeclareLaunchArgument('rviz', default_value='true',
-                              description='Open RViz.'),
+        # DeclareLaunchArgument('use_sim_time', default_value=['true'],
+        #                     description='use sim time from /clock'),    
+        # DeclareLaunchArgument('rviz', default_value='true',
+        #                       description='Open RViz.'),
         #gz_sim,
-        bridge,
+        rviz_node,move_group_node
+        # rviz_node,
         # dbridge,
         #rviz
     ])

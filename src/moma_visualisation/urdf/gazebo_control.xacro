@@ -111,6 +111,37 @@
       <state_interface name="position"/>
       <state_interface name="velocity"/>
     </joint>
+
+    <joint name="finger_joint">
+      <command_interface name="position" />
+      <state_interface name="position">
+        <param name="initial_value">0.05</param>
+      </state_interface>
+      <state_interface name="velocity">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+    </joint>
+    <joint name="left_inner_knuckle_joint">
+      <param name="mimic">finger_joint</param>
+      <param name="multiplier">-1</param>
+    </joint>
+    <joint name="left_inner_finger_joint">
+      <param name="mimic">finger_joint</param>
+      <param name="multiplier">1</param>
+    </joint>
+    <joint name="right_outer_knuckle_joint">
+      <param name="mimic">finger_joint</param>
+      <param name="multiplier">-1</param>
+    </joint>
+    <joint name="right_inner_knuckle_joint">
+      <param name="mimic">finger_joint</param>
+      <param name="multiplier">-1</param>
+    </joint>
+    <joint name="right_inner_finger_joint">
+      <param name="mimic">finger_joint</param>
+      <param name="multiplier">1</param>
+    </joint>
+
   </ros2_control>
   <gazebo>
     <plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnitionROS2ControlPlugin">

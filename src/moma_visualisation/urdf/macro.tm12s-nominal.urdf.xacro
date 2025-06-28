@@ -363,5 +363,49 @@
       <origin rpy="0.000000 0.000000 0.000000" xyz="0.000000 0.000000 0.000000" />
     </joint>
     <!--LinkDescription-->
+
+    <!-- <xacro:include filename="$(find moma_visualisation)/urdf/2f_140.ros2_control.xacro" /> -->
+
+    <joint name="${prefix}robotiq_base_joint" type="fixed">
+      <parent link="${prefix}flange" />
+      <child link="${prefix}robotiq_140_base_link" />
+      <origin xyz="0 0 0" rpy="0 0 ${pi/2}" />
+    </joint>
+
+    <link name="${prefix}robotiq_140_base_link">
+      <inertial>
+        <origin xyz="8.625E-08 -4.6583E-06 0.03145" rpy="0 0 0" />
+        <mass value="0.22652" />
+        <inertia ixx="0.00020005" ixy="-4.2442E-10" ixz="-2.9069E-10" iyy="0.00017832" iyz="-3.4402E-08" izz="0.00013478" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="file://$(find moma_visualisation)/meshes/robotiq_2f_140_base_link.stl" />
+        </geometry>
+        <material name="">
+          <color rgba="0.1 0.1 0.1 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="file://$(find moma_visualisation)/meshes/robotiq_2f_140_base_link.stl" />
+        </geometry>
+      </collision>
+    </link>
+  <!-- <joint name="${prefix}robotiq_140_base_joint" type="fixed">
+      <parent link="${prefix}robotiq_base_link" />
+      <child link="${prefix}robotiq_140_base_link" />
+      <xacro:insert_block name="origin" />
+  </joint> -->
+
+  <!-- Include the finger xacros and run them -->
+  <xacro:include filename="$(find moma_visualisation)/urdf/robotiq_2f_140.xacro" />
+  <xacro:finger_links prefix="${prefix}" fingerprefix="left" stroke="140"/>
+  <xacro:finger_links prefix="${prefix}" fingerprefix="right" stroke="140"/>
+  <xacro:finger_joint prefix="${prefix}"/>
+  <xacro:right_outer_knuckle_joint prefix="${prefix}"/>
+
   </xacro:macro>
 </robot>
