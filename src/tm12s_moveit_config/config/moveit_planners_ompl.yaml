@@ -1,0 +1,7 @@
+move_group:
+  ros__parameters:
+    planning_plugin: ompl_interface/OMPLPlanner
+    request_adapters:
+      - default_planner_request_adapters/ResolveConstraintFrames
+      - default_planner_request_adapters/AddTimeParameterization
+    start_state_max_bounds_error: 0.1
