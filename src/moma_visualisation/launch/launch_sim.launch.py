@@ -17,7 +17,6 @@ from moveit_configs_utils import MoveItConfigsBuilder
 
 def generate_launch_description():
 
-
     # Include the robot_state_publisher launch file, provided by our own package. Force sim time to be enabled
     package_name = 'moma_visualisation'
     pkg_path = os.path.join(get_package_share_directory(package_name))
@@ -30,7 +29,7 @@ def generate_launch_description():
     # Include the Gazebo launch file, provided by the gazebo_ros package
     gazebo = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(get_package_share_directory('ros_gz_sim'), 'launch', 'gz_sim.launch.py')]),
-                launch_arguments={"gz_args":[' -r '+ os.path.join(pkg_path,'worlds','obstacles.sdf')]}.items(), # husky_depot.sdf
+                launch_arguments={"gz_args":[' -r '+ os.path.join(pkg_path,'worlds','husky_depot.sdf')]}.items(), # obstacles.sdf
                 condition=UnlessCondition(LaunchConfiguration('no_gazebo'))
     )
     
@@ -57,27 +56,39 @@ def generate_launch_description():
     )
 
     # Joint State Broadcaster
-    load_joint_state_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 'joint_state_broadcaster'],
+    load_joint_state_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['joint_state_broadcaster', '--controller-manager', '/controller_manager'],
+        parameters=[{'use_sim_time': True}],
         output='screen'
     )
 
-    # Base controller
-    load_diff_drive_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 'diff_drive_base_controller'],
+    
+    load_diff_drive_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['diff_drive_base_controller', '--controller-manager', '/controller_manager'],
+        parameters=[{'use_sim_time': True}],
         output='screen'
     )
 
-    # Robot arm controller
-    load_arm_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 'arm_controller'],
+    load_arm_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['arm_controller', '--controller-manager', '/controller_manager'],
+        parameters=[{'use_sim_time': True}],
         output='screen'
     )
 
-    load_gripper_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 'robotiq_gripper_controller'],
+    load_gripper_controller = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['robotiq_gripper_controller', '--controller-manager', '/controller_manager'],
+        parameters=[{'use_sim_time': True}],
         output='screen'
     )
+
 
     # Send controlled base velocity to gazebo
     cmd_vel_bridge = Node(

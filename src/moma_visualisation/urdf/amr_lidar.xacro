@@ -17,7 +17,7 @@
     <link name="amr_lidar_body">
         <visual>
             <geometry>
-                <cylinder length="0.004" radius="0.007"/>
+                <cylinder length="0.050" radius="0.050"/>
             </geometry>
             <material name="amr_laser_red"/>
         </visual>

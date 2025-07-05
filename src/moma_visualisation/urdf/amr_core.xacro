@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot name="AMR_Platform"
   xmlns:xacro="http://www.ros.org/wiki/xacro">
-
+  <!-- COLOURS -->
   <material name="amr_body_color">
     <color rgba="0.5 0.4 0.9 1.0"/>
   </material>
@@ -9,14 +9,15 @@
   <material name="amr_wheel_color">
     <color rgba="0.1 0.2 0.0 1.0"/>
   </material>
-  <!-- BASE LINK -->
 
+  <!-- BASE LINK -->
   <link name="base_link">
     <static>true</static>
   </link>
   
+  <!-- MAIN BODY COMPOSED OF 3 ABSTRACT BOXES -->
   <link name="amr_main_body">
-    <visual>
+    <!-- <visual>
       <origin rpy="0 0 0" xyz="0 0 0.01"/>
       <geometry>
         <box size="0.7 0.5 0.14 "/>
@@ -36,10 +37,16 @@
         <box size="0.7 0.5 0.14 "/>
       </geometry>
       <material name="amr_body_color"></material>
+    </visual> -->
+
+    <visual>
+      <origin rpy="0 0 3.1415926535897" xyz="0 0 -0.085"/>
+      <geometry>
+        <mesh filename="package://moma_visualisation/meshes/LD250.obj"/>
+      </geometry>
+      <material name="white"/>
     </visual>
 
-
-    <!--  -->
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.01"/>
       <geometry>
@@ -58,11 +65,27 @@
         <box size="0.7 0.5 0.14 "/>
       </geometry>
     </collision>
-    <inertial>
+
+    <!-- <collision>
+      <origin rpy="1.5707963267949 0 1.5707963267949" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://moma_visualisation/meshes/AMR_Platform.STL"/>
+      </geometry>
+    </collision> -->
+
+    <!-- <inertial>
       <mass value="10000.07"/>
       <origin rpy="0 0 0" xyz="-0.03 0 0"/>
       <inertia ixx="0.426" ixy="0.0" ixz="0.0" iyy="0.496" iyz="0.0" izz="0.91"/>
+    </inertial> -->
+
+    <inertial>
+      <!-- <mass value="4.07"/> -->
+      <mass value="146"/> <!-- TRUE MASS FROM DATASHEET -->
+      <origin rpy="0 0 0" xyz="-0.03 0 0"/>
+      <inertia ixx="0.426" ixy="0.0" ixz="0.0" iyy="0.496" iyz="0.0" izz="0.91"/>
     </inertial>
+
   </link>
 
   <joint name="main_body_to_base" type="fixed">
@@ -74,14 +97,14 @@
     <visual>
       <origin rpy="1.5707963267949 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder length="0.03937" radius="0.088"/>
+        <cylinder length="0.03937" radius="0.105"/>
       </geometry>
       <material name="amr_wheel_color"/>
     </visual>
     <collision>
       <origin rpy="1.5707963267949 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder length="0.03937" radius="0.088"/>
+        <cylinder length="0.03937" radius="0.105"/>
       </geometry>
     </collision>
     <inertial>
@@ -93,20 +116,21 @@
     <axis rpy="0 0 0" xyz="0 1 0"/>
     <parent link="amr_main_body"/>
     <child link="left_wheel"/>
-    <origin rpy="0 0 0" xyz="0 0.3 0.000881"/>
+    <!-- <origin rpy="0 0 0" xyz="0 0.3 0.000881"/> -->
+    <origin rpy="0 0 0" xyz="-0.004 0.3025 0.02"/>
   </joint>
   <link name="right_wheel">
     <visual>
       <origin rpy="1.5707963267949 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder length="0.03937" radius="0.088"/>
+        <cylinder length="0.03937" radius="0.105"/>
       </geometry>
       <material name="amr_wheel_color"/>
     </visual>
     <collision>
       <origin rpy="1.5707963267949 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder length="0.03937" radius="0.088"/>
+        <cylinder length="0.03937" radius="0.105"/>
       </geometry>
     </collision>
     <inertial>
@@ -118,20 +142,22 @@
     <axis rpy="0 0 0" xyz="0 1 0"/>
     <parent link="amr_main_body"/>
     <child link="right_wheel"/>
-    <origin rpy="0 0 0" xyz="0 -0.3 0.000881"/>
+    <!-- <origin rpy="0 0 0" xyz="0 -0.3 0.000881"/> -->
+    <origin rpy="0 0 0" xyz="-0.004 -0.3025 0.02"/>
   </joint>
+
   <link name="right_front_small_wheel">
     <visual>
       <origin rpy="1.5707963267949 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder length="0.02775" radius="0.03625"/>
+        <cylinder length="0.02775" radius="0.063"/>
       </geometry>
       <material name="amr_wheel_color"/>
     </visual>
     <collision>
       <origin rpy="1.5707963267949 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder length="0.02775" radius="0.03625"/>
+        <cylinder length="0.02775" radius="0.063"/>
       </geometry>
     </collision>
     <inertial>
@@ -143,20 +169,20 @@
     <axis rpy="0 0 0" xyz="0 1 0"/>
     <parent link="amr_main_body"/>
     <child link="right_front_small_wheel"/>
-    <origin rpy="0 0 0" xyz="0.209 -0.108 -0.049"/>
+    <origin rpy="0 0 0" xyz="0.2493 -0.2325 -0.022"/>
   </joint>
   <link name="left_front_small_wheel">
     <visual>
       <origin rpy="1.5707963267949 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder length="0.02775" radius="0.03625"/>
+        <cylinder length="0.02775" radius="0.063"/>
       </geometry>
       <material name="amr_wheel_color"/>
     </visual>
     <collision>
       <origin rpy="1.5707963267949 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder length="0.02775" radius="0.03625"/>
+        <cylinder length="0.02775" radius="0.063"/>
       </geometry>
     </collision>
     <inertial>
@@ -168,20 +194,20 @@
     <axis rpy="0 0 0" xyz="0 1 0"/>
     <parent link="amr_main_body"/>
     <child link="left_front_small_wheel"/>
-    <origin rpy="0 0 0" xyz="0.209 0.108 -0.049"/>
+    <origin rpy="0 0 0" xyz="0.2493 0.2325 -0.022"/>
   </joint>
   <link name="left_back_small_wheel">
     <visual>
       <origin rpy="1.5707963267949 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder length="0.02775" radius="0.03625"/>
+        <cylinder length="0.02775" radius="0.063"/>
       </geometry>
       <material name="amr_wheel_color"/>
     </visual>
     <collision>
       <origin rpy="1.5707963267949 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder length="0.02775" radius="0.03625"/>
+        <cylinder length="0.02775" radius="0.063"/>
       </geometry>
     </collision>
     <inertial>
@@ -193,20 +219,20 @@
     <axis rpy="0 0 0" xyz="0 1 0"/>
     <parent link="amr_main_body"/>
     <child link="left_back_small_wheel"/>
-    <origin rpy="0 0 0" xyz="-0.228 0.156 -0.049"/>
+    <origin rpy="0 0 0" xyz="-0.257 0.2325 -0.022"/>
   </joint>
   <link name="right_back_small_wheel">
     <visual>
       <origin rpy="1.5707963267949 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder length="0.02775" radius="0.03625"/>
+        <cylinder length="0.02775" radius="0.063"/>
       </geometry>
       <material name="amr_wheel_color"/>
     </visual>
     <collision>
       <origin rpy="1.5707963267949 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder length="0.02775" radius="0.03625"/>
+        <cylinder length="0.02775" radius="0.063"/>
       </geometry>
     </collision>
     <inertial>
@@ -218,7 +244,7 @@
     <axis rpy="0 0 0" xyz="0 1 0"/>
     <parent link="amr_main_body"/>
     <child link="right_back_small_wheel"/>
-    <origin rpy="0 0 0" xyz="-0.228 -0.156 -0.049"/>
+    <origin rpy="0 0 0" xyz="-0.257 -0.2325 -0.022"/>
   </joint>
 
 </robot>

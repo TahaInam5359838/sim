@@ -6,7 +6,7 @@
   <xacro:arg name="color" default="darkolive" />
   <xacro:arg name="trans_hw_iface" default="hardware_interface/PositionJointInterface" />
 
-  <xacro:include filename="macro.gazebo.xacro" />
+  
   <xacro:include filename="macro.transmission.xacro" />
   <xacro:include filename="macro.materials.xacro" />
 
@@ -16,7 +16,7 @@
   <!-- you must modify 'macro.tm12s-nominal.urdf.xacro' to 'user_defined.urdf.xacro'  -->
   <xacro:include filename="macro.tm12s-nominal.urdf.xacro" />
 
-
+  <xacro:include filename="macro.gazebo.xacro" />
   <!--  -->
   <xacro:tmr_gazebo ns="$(arg ns)" prefix="$(arg prefix)" />
   <xacro:tmr_transmission prefix="$(arg prefix)" hw_iface="$(arg trans_hw_iface)" />

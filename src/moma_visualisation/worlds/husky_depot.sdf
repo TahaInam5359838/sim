@@ -1,17 +1,22 @@
 <?xml version='1.0' encoding='utf-8'?>
 <sdf version='1.9'>
   <world name='world_demo'>
-    <physics name='1ms' type='ignored'>
+    <!-- <physics name='1ms' type='ignored'>
       <max_step_size>0.01</max_step_size>
       <real_time_factor>1</real_time_factor>
+    </physics> -->
+    <physics type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
     </physics>
-    <plugin name='ignition::gazebo::systems::Physics' filename='libignition-gazebo-physics-system.so'/>
+    <!-- <plugin name='ignition::gazebo::systems::Physics' filename='libignition-gazebo-physics-system.so'/>
     <plugin name='ignition::gazebo::systems::UserCommands' filename='libignition-gazebo-user-commands-system.so'/>
-    <plugin name='ignition::gazebo::systems::SceneBroadcaster' filename='libignition-gazebo-scene-broadcaster-system.so'/>
-    <plugin name='ignition::gazebo::systems::Imu' filename='ignition-gazebo-imu-system'/>
+    <plugin name='ignition::gazebo::systems::SceneBroadcaster' filename='libignition-gazebo-scene-broadcaster-system.so'/> -->
+    <!-- <plugin name='ignition::gazebo::systems::Imu' filename='ignition-gazebo-imu-system'/>
     <plugin name='ignition::gazebo::systems::Sensors' filename='ignition-gazebo-sensors-system'>
       <render_engine>ogre2</render_engine>
-    </plugin>
+    </plugin> -->
     <scene>
       <ambient>1 1 1 1</ambient>
       <background>0.3 0.7 0.9 1</background>
@@ -394,12 +399,11 @@
       </link>
     </model>
 
-    <include>
+    <!-- <include>
       <uri>https://fuel.ignitionrobotics.org/1.0/MovAi/models/MARBLE_HUSKY_SENSOR_CONFIG_1</uri>
       <name>husky</name>
       <pose>2.75268 1.0014 0.132279 0 0 0</pose>
 
-      <!-- Gimbal Joints Plugins -->
       <plugin filename="libignition-gazebo-joint-controller-system.so" name="ignition::gazebo::systems::JointController">
         <joint_name>pan_gimbal_joint</joint_name>
         <use_force_commands>false</use_force_commands>
@@ -413,7 +417,6 @@
         <i_gain>10</i_gain>
       </plugin>
 
-      <!-- TF Publisher -->
       <plugin filename="ignition-gazebo-pose-publisher-system" name="ignition::gazebo::systems::PosePublisher">
         <publish_link_pose>true</publish_link_pose>
         <publish_collision_pose>false</publish_collision_pose>
@@ -422,7 +425,6 @@
         <update_frequency>20</update_frequency>
       </plugin>
 
-      <!-- DIFF DRIVE PLUGIN / WHEELS CONTROLER -->
       <plugin filename="ignition-gazebo-diff-drive-system" name="ignition::gazebo::systems::DiffDrive">
         <left_joint>rear_left_wheel_joint</left_joint>
         <left_joint>front_left_wheel_joint</left_joint>
@@ -434,6 +436,6 @@
         <frame_id>odom</frame_id>
         <child_frame_id>base_link</child_frame_id>
       </plugin>
-    </include>
+    </include> -->
   </world>
 </sdf>
