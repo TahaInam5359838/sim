@@ -16,6 +16,7 @@
         <axis rpy="0 0 1.57" xyz="0 0 0.5"/>
         <parent link="amr_main_body"/>
         <child link="chassis"/>
+        <origin xyz="-0.08 0 -0.07" rpy="0 0 0"/>
     </joint>
 
     <joint name="tm12s_base_fixed_joint" type="fixed">

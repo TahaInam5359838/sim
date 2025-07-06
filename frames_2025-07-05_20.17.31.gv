@@ -1,0 +1,38 @@
+digraph G {
+"map" -> "odom"[label=" Broadcaster: default_authority\nAverage rate: 41.6\nBuffer length: 1.25\nMost recent transform: 143.65\nOldest transform: 142.4\n"];
+"odom" -> "base_link"[label=" Broadcaster: default_authority\nAverage rate: 20.833\nBuffer length: 1.2\nMost recent transform: 143.452\nOldest transform: 142.252\n"];
+"base_link" -> "base_footprint"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"link_6" -> "camera_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"link_5" -> "link_6"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"amr_main_body" -> "chassis"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "amr_main_body"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"link_6" -> "flange"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"left_inner_finger" -> "left_inner_finger_pad"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"left_outer_finger" -> "left_inner_finger"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"left_outer_knuckle" -> "left_outer_finger"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"robotiq_140_base_link" -> "left_outer_knuckle"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"amr_main_body" -> "amr_lidar_body"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"right_inner_finger" -> "right_inner_finger_pad"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"right_outer_finger" -> "right_inner_finger"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"right_outer_knuckle" -> "right_outer_finger"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"robotiq_140_base_link" -> "right_outer_knuckle"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"flange" -> "robotiq_140_base_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"chassis" -> "link_0"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"link_0" -> "link_1"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"link_1" -> "link_2"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"link_2" -> "link_3"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"link_3" -> "link_4"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"link_4" -> "link_5"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"amr_main_body" -> "left_back_small_wheel"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"amr_main_body" -> "left_front_small_wheel"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"robotiq_140_base_link" -> "left_inner_knuckle"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"amr_main_body" -> "left_wheel"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"amr_main_body" -> "right_back_small_wheel"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"amr_main_body" -> "right_front_small_wheel"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"robotiq_140_base_link" -> "right_inner_knuckle"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+"amr_main_body" -> "right_wheel"[label=" Broadcaster: default_authority\nAverage rate: 21.0\nBuffer length: 1.0\nMost recent transform: 143.459\nOldest transform: 142.459\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1751710651.8947306"[ shape=plaintext ] ;
+}->"map";
+}

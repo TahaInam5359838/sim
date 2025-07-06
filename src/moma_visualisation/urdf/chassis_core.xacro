@@ -3,9 +3,9 @@
   <link name="chassis">
     <visual>
       <material name="amr_body_color" />
-      <origin rpy="0 0 0" xyz="0 0 0.545"/>
+      <origin rpy="0 0 0" xyz="0.078 0 0.545"/>
       <geometry>
-        <box size="0.95 0.69 0.35 "/>
+        <box size="0.95 0.7 0.37 "/>
       </geometry>
     </visual>
     <!-- <visual>
@@ -24,9 +24,9 @@
     </visual> -->
 
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.545"/>
+      <origin rpy="0 0 0" xyz="0.078 0 0.545"/>
       <geometry>
-        <box size="0.95 0.69 0.35 "/>
+        <box size="0.95 0.7 0.37 "/>
       </geometry>
     </collision>
     <!-- <collision>

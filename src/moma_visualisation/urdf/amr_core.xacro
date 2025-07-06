@@ -17,7 +17,7 @@
   
   <!-- MAIN BODY COMPOSED OF 3 ABSTRACT BOXES -->
   <link name="amr_main_body">
-    <!-- <visual>
+    <visual>
       <origin rpy="0 0 0" xyz="0 0 0.01"/>
       <geometry>
         <box size="0.7 0.5 0.14 "/>
@@ -37,15 +37,23 @@
         <box size="0.7 0.5 0.14 "/>
       </geometry>
       <material name="amr_body_color"></material>
+    </visual>
+
+    <!-- <visual>
+      <origin rpy="-1.5707963267949 0 3.1415926535897" xyz="0 0 -0.085"/>
+      <geometry>
+        <mesh filename="package://moma_visualisation/meshes/amr_chassis_scaled.stl"/>
+      </geometry>
+      <material name="white"/>
     </visual> -->
 
-    <visual>
+    <!-- <visual>
       <origin rpy="0 0 3.1415926535897" xyz="0 0 -0.085"/>
       <geometry>
         <mesh filename="package://moma_visualisation/meshes/LD250.obj"/>
       </geometry>
       <material name="white"/>
-    </visual>
+    </visual> -->
 
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0.01"/>
@@ -69,7 +77,7 @@
     <!-- <collision>
       <origin rpy="1.5707963267949 0 1.5707963267949" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://moma_visualisation/meshes/AMR_Platform.STL"/>
+        <mesh filename="package://moma_visualisation/meshes/LD250.obj"/>
       </geometry>
     </collision> -->
 
@@ -81,7 +89,7 @@
 
     <inertial>
       <!-- <mass value="4.07"/> -->
-      <mass value="146"/> <!-- TRUE MASS FROM DATASHEET -->
+      <mass value="10000.07"/> <!-- TRUE MASS FROM DATASHEET + 60 -->
       <origin rpy="0 0 0" xyz="-0.03 0 0"/>
       <inertia ixx="0.426" ixy="0.0" ixz="0.0" iyy="0.496" iyz="0.0" izz="0.91"/>
     </inertial>
@@ -91,7 +99,7 @@
   <joint name="main_body_to_base" type="fixed">
     <parent link="base_link"/>
     <child link="amr_main_body"/>
-    <origin xyz="0 0 0.09"/>
+    <origin xyz="0 0 0.15"/>
   </joint>
   <link name="left_wheel">
     <visual>
