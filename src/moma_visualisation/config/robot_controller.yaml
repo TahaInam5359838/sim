@@ -59,7 +59,7 @@ diff_drive_base_controller:
 
     wheel_separation: 0.605
     # wheels_per_side: 3
-    wheel_radius: 0.105
+    wheel_radius: 0.088
 
     wheel_separation_multiplier: 1.0
     left_wheel_radius_multiplier: 1.0
