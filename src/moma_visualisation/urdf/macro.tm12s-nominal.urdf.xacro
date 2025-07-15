@@ -3,7 +3,31 @@
 
   <xacro:include filename="macro.inertial.xacro" />
 
-  <xacro:macro name="tm12s" params="ns prefix color:=none format:=obj joint_1_lower_limit:=${radians(-360)} joint_1_upper_limit:=${radians(360)} joint_2_lower_limit:=${radians(-360)} joint_2_upper_limit:=${radians(360)} joint_3_lower_limit:=${radians(-162)} joint_3_upper_limit:=${radians(162)} joint_4_lower_limit:=${radians(-360)} joint_4_upper_limit:=${radians(360)} joint_5_lower_limit:=${radians(-360)} joint_5_upper_limit:=${radians(360)} joint_6_lower_limit:=${radians(-360)} joint_6_upper_limit:=${radians(360)} joint_1_velocity_limit:=${radians(130)} joint_2_velocity_limit:=${radians(130)} joint_3_velocity_limit:=${radians(210)} joint_4_velocity_limit:=${radians(225)} joint_5_velocity_limit:=${radians(225)} joint_6_velocity_limit:=${radians(450)} joint_1_effort_limit:=${350} joint_2_effort_limit:=${350} joint_3_effort_limit:=${170} joint_4_effort_limit:=${45} joint_5_effort_limit:=${45} joint_6_effort_limit:=${45} safety_limits:=false safety_pos_margin:=0.15 safety_k_position:=20">
+  <xacro:macro name="tm12s" params="ns prefix color:=none format:=obj 
+    joint_1_lower_limit:=${radians(-360)} joint_1_upper_limit:=${radians(360)} 
+    joint_2_lower_limit:=${radians(-360)} joint_2_upper_limit:=${radians(360)} 
+    joint_3_lower_limit:=${radians(-162)} joint_3_upper_limit:=${radians(162)} 
+    joint_4_lower_limit:=${radians(-360)} joint_4_upper_limit:=${radians(360)} 
+    joint_5_lower_limit:=${radians(-360)} joint_5_upper_limit:=${radians(360)} 
+    joint_6_lower_limit:=${radians(-360)} joint_6_upper_limit:=${radians(360)} 
+    
+    joint_1_velocity_limit:=${radians(130)} 
+    joint_2_velocity_limit:=${radians(130)} 
+    joint_3_velocity_limit:=${radians(210)} 
+    joint_4_velocity_limit:=${radians(225)} 
+    joint_5_velocity_limit:=${radians(225)} 
+    joint_6_velocity_limit:=${radians(450)} 
+    
+    joint_1_effort_limit:=${350}
+    joint_2_effort_limit:=${350} 
+    joint_3_effort_limit:=${170} 
+    joint_4_effort_limit:=${45} 
+    joint_5_effort_limit:=${45} 
+    joint_6_effort_limit:=${45} 
+    
+    safety_limits:=false 
+    safety_pos_margin:=0.15 
+    safety_k_position:=20">
 
     <xacro:property name="damping_factor" value="0.000"/>
     <xacro:property name="d1" value="${damping_factor*0.1}"/>
