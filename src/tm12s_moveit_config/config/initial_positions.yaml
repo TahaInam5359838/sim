@@ -2,9 +2,9 @@
 
 initial_positions:
   finger_joint: 0
-  joint_1: 0
-  joint_2: 0
-  joint_3: 0
-  joint_4: 0
-  joint_5: 0
-  joint_6: 0
+  joint_1: -1.6156513
+  joint_2: -0.09616764
+  joint_3: 2.2113322
+  joint_4: -0.5290093
+  joint_5: 1.569051
+  joint_6: -0.07592182

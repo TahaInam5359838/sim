@@ -47,6 +47,14 @@
         <joint name="joint_5" value="0"/>
         <joint name="joint_6" value="0"/>
     </group_state>
+    <group_state name="home" group="tm12S_planninggroup">
+        <joint name="joint_1" value="-1.6156513"/>
+        <joint name="joint_2" value="-0.09616764"/>
+        <joint name="joint_3" value="2.2113322"/>
+        <joint name="joint_4" value="-0.5290093"/>
+        <joint name="joint_5" value="1.569051"/>
+        <joint name="joint_6" value="-0.07592182"/>
+    </group_state>
     <group_state name="open" group="robotiq2F140_planningroup">
         <joint name="finger_joint" value="0.01"/>
     </group_state>

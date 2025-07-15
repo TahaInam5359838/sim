@@ -10,7 +10,7 @@
         <param name="initial_value">0.0</param>
       </state_interface>
       <state_interface name="position">
-        <param name="initial_value">0.0</param>
+        <param name="initial_value">-1.6156513</param>
       </state_interface>
     </joint>
 
@@ -20,7 +20,7 @@
         <param name="initial_value">0.0</param>
       </state_interface>
       <state_interface name="position">
-        <param name="initial_value">0.0</param>
+        <param name="initial_value">-0.09616764</param>
       </state_interface>
     </joint>
 
@@ -30,7 +30,7 @@
         <param name="initial_value">0.0</param>
       </state_interface>
       <state_interface name="position">
-        <param name="initial_value">0.0</param>
+        <param name="initial_value">2.2113322</param>
       </state_interface>
     </joint>
 
@@ -40,7 +40,7 @@
         <param name="initial_value">0.0</param>
       </state_interface>
       <state_interface name="position">
-        <param name="initial_value">0.0</param>
+        <param name="initial_value">-0.5290093</param>
       </state_interface>
     </joint>
 
@@ -50,7 +50,7 @@
         <param name="initial_value">0.0</param>
       </state_interface>
       <state_interface name="position">
-        <param name="initial_value">0.0</param>
+        <param name="initial_value">1.569051</param>
       </state_interface>
     </joint>
 
@@ -60,7 +60,7 @@
         <param name="initial_value">0.0</param>
       </state_interface>
       <state_interface name="position">
-        <param name="initial_value">0.0</param>
+        <param name="initial_value">-0.07592182</param>
       </state_interface>
     </joint>
     <joint name="left_wheel_joint">
