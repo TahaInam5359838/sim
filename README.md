@@ -23,6 +23,8 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -p use_sim_time:
 
 ros2 run rviz2 rviz2 -d ../../Depth_Camera_Simulation/d435_ws/src/depth_d435/rviz/ns_robot2.rviz --ros-args -p use_sim_time:=true
 
+ros2 run moveit_test joints --ros-args -p use_sim_time:=true
+
 
 rqt
 

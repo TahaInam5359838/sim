@@ -12,7 +12,7 @@ int main(int argc, char** argv)
   std::thread([&executor]() { executor.spin(); }).detach();
 
   // Use planning group name from SRDF
-  static const std::string PLANNING_GROUP = "tm12S_planninggroup";  // change this!
+  static const std::string PLANNING_GROUP = "tm12S_planninggroup";
 
   moveit::planning_interface::MoveGroupInterface move_group(node, PLANNING_GROUP);
 

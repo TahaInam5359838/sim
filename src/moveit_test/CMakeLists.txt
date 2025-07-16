@@ -15,12 +15,24 @@ find_package(moveit_ros_planning_interface REQUIRED)
 add_executable(cartesian src/cartesian.cpp)
 ament_target_dependencies(cartesian rclcpp moveit_ros_planning_interface)
 
+add_executable(joints src/joints.cpp)
+ament_target_dependencies(joints rclcpp moveit_ros_planning_interface)
+
+
 target_include_directories(cartesian PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 target_compile_features(cartesian PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 
+target_include_directories(joints PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_compile_features(joints PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+
 install(TARGETS cartesian
+  DESTINATION lib/${PROJECT_NAME})
+
+install(TARGETS joints
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
