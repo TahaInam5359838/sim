@@ -29,7 +29,7 @@ def generate_launch_description():
     # Include the Gazebo launch file, provided by the gazebo_ros package
     gazebo = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(get_package_share_directory('ros_gz_sim'), 'launch', 'gz_sim.launch.py')]),
-                launch_arguments={"gz_args":[' -r '+ os.path.join(pkg_path,'worlds','obstacles.sdf')]}.items(), # husky_depot.sdf
+                launch_arguments={"gz_args":[' -r '+ os.path.join(pkg_path,'worlds','ign_lab_save.sdf')]}.items(), # husky_depot.sdf
                 condition=UnlessCondition(LaunchConfiguration('no_gazebo'))
     )
     
