@@ -45,8 +45,8 @@ int main(int argc, char** argv)
   // Set target pose
   geometry_msgs::msg::Pose target_pose;
   target_pose.position.x = 0.2;
-  target_pose.position.y = 0.0;
-  target_pose.position.z = 1.2;
+  target_pose.position.y = -0.25;
+  target_pose.position.z = 1.4;
   tf2::Quaternion q(0.5, 0.5, 0.0, 0.0);
   q.normalize();
   target_pose.orientation.x = q.x();
@@ -122,6 +122,12 @@ int main(int argc, char** argv)
               abs(target_pose.orientation.y-current_pose.pose.orientation.y),
               abs(target_pose.orientation.z-current_pose.pose.orientation.z),
               abs(target_pose.orientation.w-current_pose.pose.orientation.w));
+
+  // Position Error: [x=3.2504564100e-05, y=8.9988083888e-06, z=3.4684134614e-05]
+  // Orientation Error: [x=2.3682862628e-04, y=2.3667580623e-04, z=2.6969148145e-04, w=1.7687130967e-04]
+
+  // Position Error: [x=7.0211867632e-05, y=7.3023362948e-06, z=5.7065886001e-05]
+  // Orientation Error: [x=2.1012801513e-05, y=2.0994512435e-05, z=4.3793828426e-05, w=1.5186986420e-04]
 
   rclcpp::shutdown();
   return 0;
