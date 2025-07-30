@@ -28,6 +28,8 @@ arm_controller:
     state_interfaces:
       - position
       - velocity
+    state_publish_rate: 50.0
+    action_monitor_rate: 20.0
 robotiq_gripper_controller:
   ros__parameters:
     joint: finger_joint

@@ -14,6 +14,19 @@ from launch.event_handlers import OnProcessExit
 
 from moveit_configs_utils import MoveItConfigsBuilder
 
+import yaml
+
+
+def load_yaml(package_name, file_path):
+    package_path = get_package_share_directory(package_name)
+    absolute_file_path = os.path.join(package_path, file_path)
+
+    try:
+        with open(absolute_file_path, 'r') as file:
+            return yaml.safe_load(file)
+    except OSError:  # parent of IOError, OSError *and* WindowsError where available
+        return None
+
 
 def generate_launch_description():
 
@@ -164,18 +177,51 @@ def generate_launch_description():
         .planning_scene_monitor(
             publish_robot_description= True, publish_robot_description_semantic=True, publish_planning_scene=True
         )
-        .planning_pipelines(
-            pipelines=["ompl"]
-        )
         .to_moveit_configs()
     )
+
+    # More Moveit configs
+    planning_pipeline_config = {
+          'planning_pipelines' : ['ompl', 'pilz_industrial_motion_planner'],
+          'ompl': {
+                'planning_plugin': 'ompl_interface/OMPLPlanner',
+                'request_adapters': """default_planner_request_adapters/AddTimeOptimalParameterization 
+                                       default_planner_request_adapters/FixWorkspaceBounds 
+                                       default_planner_request_adapters/FixStartStateBounds 
+                                       default_planner_request_adapters/FixStartStateCollision 
+                                       default_planner_request_adapters/FixStartStatePathConstraints
+                                       default_planner_request_adapters/ResolveConstraintFrames""",
+                'start_state_max_bounds_error': 0.1,
+          },
+          'pilz_industrial_motion_planner': {
+                'planning_plugin': 'pilz_industrial_motion_planner/CommandPlanner',
+                'request_adapters': '',
+                'start_state_max_bounds_error': 0.1,
+          }
+    }
+
+    ompl_planning_yaml = load_yaml('tm12s_moveit_config', 'config/ompl_planning.yaml')
+    planning_pipeline_config['ompl'].update(ompl_planning_yaml)
+
+    pilz_planning_yaml = load_yaml('tm12s_moveit_config', 'config/pilz_industrial_motion_planner_planning.yaml')
+    planning_pipeline_config['pilz_industrial_motion_planner'].update(pilz_planning_yaml)
+
+    controllers_yaml = load_yaml('tm12s_moveit_config', 'config/moveit_controllers.yaml')
+    moveit_controllers = {'moveit_simple_controller_manager': controllers_yaml,
+                          'moveit_controller_manager': 'moveit_simple_controller_manager/MoveItSimpleControllerManager'}
+    
+    joint_limits_yaml = {
+        'robot_description_planning': load_yaml('tm12s_moveit_config', 'config/joint_limits.yaml')
+    }
+
+    cartesian_limits_yaml = load_yaml('tm12s_moveit_config', 'config/pilz_cartesian_limits.yaml')
 
     rviz_config_path = os.path.join(
         get_package_share_directory("tm12s_moveit_config"),
         "config",
         "moveit.rviz",
     )
-
+    
     rviz_node = Node(
         package="rviz2",
         executable="rviz2",
@@ -185,22 +231,25 @@ def generate_launch_description():
         parameters=[
             moveit_config.robot_description,
             moveit_config.robot_description_semantic,
-            moveit_config.planning_pipelines,
+            planning_pipeline_config,
             moveit_config.robot_description_kinematics,
             moveit_config.planning_scene_monitor,
-            {'use_sim_time': True},
+            {'use_sim_time': True}
         ],
     )
 
     use_sim_time={"use_sim_time": True}
     config_dict = moveit_config.to_dict()
     config_dict.update(use_sim_time)
+    config_dict.update(planning_pipeline_config)
+    config_dict.update(moveit_controllers)
+    config_dict.update(joint_limits_yaml)
 
     move_group_node = Node(
         package="moveit_ros_move_group",
         executable="move_group",
         output="screen",
-        parameters=[config_dict],
+        parameters=[config_dict, cartesian_limits_yaml],
         arguments=["--ros-args", "--log-level", "info"],
     )
     
