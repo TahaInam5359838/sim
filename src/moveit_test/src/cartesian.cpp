@@ -12,7 +12,7 @@
 #include <tf2_ros/buffer.h>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 
-
+#include <fstream>
 
 using namespace std::chrono_literals;
 using MoveGroup = moveit_msgs::action::MoveGroup;
@@ -33,78 +33,7 @@ public:
     tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
   }
 
-  void send_cartesian_goal() {
-    RCLCPP_INFO(get_logger(), "Waiting for move_group action server...");
-    if (!client_->wait_for_action_server(10s)) {
-      RCLCPP_ERROR(get_logger(), "move_group action server not available.");
-      return;
-    }
-
-    rclcpp::sleep_for(500ms);
-
-    // Initial target pose (starting point)
-    geometry_msgs::msg::PoseStamped start_pose;
-    start_pose.header.frame_id = "link_0";
-    start_pose.pose.position.x = -0.204;
-    start_pose.pose.position.y = -0.513;
-    start_pose.pose.position.z =  0.386;
-    tf2::Quaternion q(1.0, 0.0, 0.0, 0.0);
-    q.normalize();
-    start_pose.pose.orientation.x = q.x();
-    start_pose.pose.orientation.y = q.y();
-    start_pose.pose.orientation.z = q.z();
-    start_pose.pose.orientation.w = q.w();
-
-    // Store for error checking later
-    target_pose_ = start_pose;
-
-    // Movement Sequence (displacement from starting position in meters)
-    double rad = 0.01; // move in a sphere of radius 300mm
-    std::vector<std::vector<double>> displacements;
-
-    displacements.push_back({ rad, 0.0, 0.0 });  // +X
-    displacements.push_back({-rad, 0.0, 0.0 });  // -X
-    displacements.push_back({ 0.0,  rad, 0.0 }); // +Y
-    displacements.push_back({ 0.0, -rad, 0.0 }); // -Y
-    displacements.push_back({ 0.0, 0.0,  rad }); // +Z
-    displacements.push_back({ 0.0, 0.0, -rad }); // -Z
-
-    // Diagonal directions (8 points: all combinations of ±X, ±Y, ±Z)
-    std::vector<int> signs = {-1, 1};
-    for (int sx : signs) {
-      for (int sy : signs) {
-        for (int sz : signs) {
-          // Normalize direction vector to have length `radius`
-          double inv_len = 1.0 / std::sqrt(3.0);
-          displacements.push_back({sx * rad * inv_len, sy * rad * inv_len, sz * rad * inv_len});
-        }
-      }
-    }
-
-
-    for (const auto& disp : displacements) {
-      geometry_msgs::msg::PoseStamped offset_pose = start_pose;
-      offset_pose.pose.position.x += disp[0];
-      offset_pose.pose.position.y += disp[1];
-      offset_pose.pose.position.z += disp[2];
-
-      RCLCPP_INFO(this->get_logger(), "Sending offset pose [%.10f, %.10f, %.10f]",
-                  offset_pose.pose.position.x,
-                  offset_pose.pose.position.y,
-                  offset_pose.pose.position.z);
-
-      send_pose_goal(offset_pose);
-      rclcpp::sleep_for(2s);  // Wait for execution and TF update
-
-      send_pose_goal(start_pose);  // Return to start
-      rclcpp::sleep_for(2s);
-    }
-
-    // rclcpp::shutdown();
-  }
-
-
-  void send_pose_goal(const geometry_msgs::msg::PoseStamped &pose) {
+  moveit_msgs::action::MoveGroup::Goal create_goal(const geometry_msgs::msg::PoseStamped &pose) {
     auto goal_msg = MoveGroup::Goal();
     goal_msg.request.group_name = "tm12S_planninggroup";
     goal_msg.request.max_velocity_scaling_factor = 0.1;
@@ -114,10 +43,10 @@ public:
     goal_msg.request.num_planning_attempts = 10;
     goal_msg.request.allowed_planning_time = 10.0;
     goal_msg.request.start_state.is_diff = true;
-  
-    moveit_msgs::msg::Constraints constraints;
-    moveit_msgs::msg::PositionConstraint pos_constraint;
-    moveit_msgs::msg::OrientationConstraint ori_constraint;
+
+    moveit_msgs::msg::Constraints           constraints     ;
+    moveit_msgs::msg::PositionConstraint    pos_constraint  ;
+    moveit_msgs::msg::OrientationConstraint ori_constraint  ;
   
     pos_constraint.header.frame_id = "link_0";
     pos_constraint.link_name = "flange";
@@ -139,13 +68,100 @@ public:
     constraints.orientation_constraints.push_back(ori_constraint);
     goal_msg.request.goal_constraints.push_back(constraints);
 
-    rclcpp::Clock sim_clock(RCL_ROS_TIME);
-    while (sim_clock.now().nanoseconds() == 0) {
-      RCLCPP_WARN(this->get_logger(), "Waiting for simulation time (/clock) to start...");
-      rclcpp::sleep_for(std::chrono::milliseconds(100));
+    return goal_msg;
+  }
+
+  geometry_msgs::msg::PoseStamped get_start_pose() {
+    geometry_msgs::msg::PoseStamped start_pose;
+    start_pose.header.frame_id = "link_0";
+    start_pose.pose.position.x = -0.204;
+    start_pose.pose.position.y = -0.513;
+    start_pose.pose.position.z =  0.386;
+    tf2::Quaternion q(1.0, 0.0, 0.0, 0.0);
+    q.normalize();
+    start_pose.pose.orientation.x = q.x();
+    start_pose.pose.orientation.y = q.y();
+    start_pose.pose.orientation.z = q.z();
+    start_pose.pose.orientation.w = q.w();
+
+    return start_pose;
+  }
+
+  // Generate a set of displacements that create a sphere (radius in m)
+  std::vector<std::vector<double>> get_spherical_path(double radius) {
+    std::vector<std::vector<double>> displacements;
+
+    displacements.push_back({ radius, 0.0, 0.0 });  // +X
+    displacements.push_back({-radius, 0.0, 0.0 });  // -X
+    displacements.push_back({ 0.0,  radius, 0.0 }); // +Y
+    displacements.push_back({ 0.0, -radius, 0.0 }); // -Y
+    displacements.push_back({ 0.0, 0.0,  radius }); // +Z
+    displacements.push_back({ 0.0, 0.0, -radius }); // -Z
+
+    // Diagonal directions (8 points: all combinations of ±X, ±Y, ±Z)
+    std::vector<int> signs = {-1, 1};
+    for (int sx : signs) {
+      for (int sy : signs) {
+        for (int sz : signs) {
+          // Normalize direction vector to have length `radius`
+          double inv_len = 1.0 / std::sqrt(3.0);
+          displacements.push_back({sx * radius * inv_len, sy * radius * inv_len, sz * radius * inv_len});
+        }
+      }
     }
 
-    // rclcpp::Clock clock(RCL_ROS_TIME);
+    return displacements;
+  }
+
+  // Send the goal motions
+  void send_cartesian_goal() {
+    RCLCPP_INFO(get_logger(), "Waiting for move_group action server...");
+    if (!client_->wait_for_action_server(10s)) {
+      RCLCPP_ERROR(get_logger(), "move_group action server not available.");
+      return;
+    }
+
+    rclcpp::sleep_for(500ms);
+
+    // Initial target pose (starting point)
+    geometry_msgs::msg::PoseStamped start_pose = get_start_pose();
+    target_pose_ = start_pose; // Store for error checking later
+
+    // Generate the target displacements
+    double rad = 0.1; 
+    std::vector<std::vector<double>> displacements = get_spherical_path(rad);
+
+    csv_file_.open("results_100mm.csv");
+    csv_file_ << "desired_x,desired_y,desired_z,"
+              << "actual_x,actual_y,actual_z,"
+              << "error_x,error_y,error_z\n";
+
+    for (const auto& disp : displacements) {
+      geometry_msgs::msg::PoseStamped offset_pose = start_pose;
+      offset_pose.pose.position.x += disp[0];
+      offset_pose.pose.position.y += disp[1];
+      offset_pose.pose.position.z += disp[2];
+
+      RCLCPP_INFO(this->get_logger(), "Sending offset pose [%.10f, %.10f, %.10f]",
+                  offset_pose.pose.position.x,
+                  offset_pose.pose.position.y,
+                  offset_pose.pose.position.z);
+
+      // Add coords to csv
+
+      send_pose_goal(offset_pose, csv_file_);
+      rclcpp::sleep_for(2s);  // Wait for execution and TF update
+
+      send_pose_goal(start_pose, csv_file_);  // Return to start
+      rclcpp::sleep_for(2s);
+    }
+    csv_file_.close();
+  }
+
+  // Actually send the goal pose to the robot
+  void send_pose_goal(const geometry_msgs::msg::PoseStamped &pose, std::ofstream& log_file) {
+    moveit_msgs::action::MoveGroup::Goal goal_msg = create_goal(pose);  
+
     auto t_start = this->now();
 
     // Send goal and wait for response
@@ -171,7 +187,6 @@ public:
   
     auto result = result_future.get();
 
-    // ⏱️ End timing
     auto t_end = this->now();
     double duration_sec = (t_end - t_start).seconds();
 
@@ -195,6 +210,18 @@ public:
       }
   
       auto transform = tf_buffer_->lookupTransform(from_frame, to_frame, tf2::TimePointZero);
+
+      const auto& actual = transform.transform.translation;
+      const auto& desired = pose.pose.position;
+
+      double err_x = std::abs(desired.x - actual.x);
+      double err_y = std::abs(desired.y - actual.y);
+      double err_z = std::abs(desired.z - actual.z);
+
+      log_file  << desired.x << "," << desired.y << "," << desired.z << ","
+                << actual.x  << "," << actual.y  << "," << actual.z  << ","
+                << err_x     << "," << err_y     << "," << err_z     << "\n";
+
   
       RCLCPP_INFO(this->get_logger(), "Actual EE Position: [%.10f, %.10f, %.10f]",
                   transform.transform.translation.x,
@@ -225,6 +252,7 @@ private:
   std::shared_ptr<tf2_ros::Buffer> tf_buffer_       ;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;  
   geometry_msgs::msg::PoseStamped target_pose_;
+  std::ofstream csv_file_;
 };
 
 int main(int argc, char ** argv)
