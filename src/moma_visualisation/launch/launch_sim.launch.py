@@ -244,12 +244,13 @@ def generate_launch_description():
     config_dict.update(planning_pipeline_config)
     config_dict.update(moveit_controllers)
     config_dict.update(joint_limits_yaml)
+    config_dict.update(cartesian_limits_yaml)
 
     move_group_node = Node(
         package="moveit_ros_move_group",
         executable="move_group",
         output="screen",
-        parameters=[config_dict, cartesian_limits_yaml],
+        parameters=[config_dict],
         arguments=["--ros-args", "--log-level", "info"],
     )
     
