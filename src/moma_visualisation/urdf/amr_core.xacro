@@ -50,7 +50,7 @@
     <visual>
       <origin rpy="0 0 3.1415926535897" xyz="0 0 -0.085"/>
       <geometry>
-        <mesh filename="package://moma_visualisation/meshes/LD250.obj"/>
+        <mesh filename="file://$(find moma_visualisation)/meshes/LD250.obj"/>
       </geometry>
       <material name="white"/>
     </visual>
