@@ -186,46 +186,51 @@ public:
     double speed = 0.15;
     int trial = 1;
 
-    std::vector<std::vector<double>> displacements = get_spherical_path(rad);
+    while (trial < 4) {
 
-    std::ostringstream csv_name;
-    csv_name << "results_" << rad << "_" << speed << "_" << trial << ".csv";
-    csv_file_.open(csv_name.str());
-    csv_file_ << "desired_x,desired_y,desired_z,"
-              << "actual_x,actual_y,actual_z,"
-              << "error_x,error_y,error_z,time\n";  
+      std::vector<std::vector<double>> displacements = get_spherical_path(rad);
 
-    std::ostringstream v_csv_name;
-    v_csv_name << "v_results_" << rad << "_" << speed << "_" << trial << ".csv";
-    v_csv_file_.open(v_csv_name.str());
+      std::ostringstream csv_name;
+      csv_name << "results_" << rad << "_" << speed << "_" << trial << ".csv";
+      csv_file_.open(csv_name.str());
+      csv_file_ << "desired_x,desired_y,desired_z,"
+                << "actual_x,actual_y,actual_z,"
+                << "error_x,error_y,error_z,time\n";  
 
-    int i = 0;
-    for (const auto& disp : displacements) {
-      RCLCPP_INFO(this->get_logger(), "Sending pose %d", i);
+      std::ostringstream v_csv_name;
+      v_csv_name << "v_results_" << rad << "_" << speed << "_" << trial << ".csv";
+      v_csv_file_.open(v_csv_name.str());
+
+      int i = 0;
+      for (const auto& disp : displacements) {
+        RCLCPP_INFO(this->get_logger(), "Sending pose %d", i);
+        
+        geometry_msgs::msg::PoseStamped offset_pose = start_pose;
+        offset_pose.pose.position.x += disp[0];
+        offset_pose.pose.position.y += disp[1];
+        offset_pose.pose.position.z += disp[2];
+
+        RCLCPP_INFO(this->get_logger(), "Sending offset pose [%.6f, %.6f, %.6f]",
+                    offset_pose.pose.position.x,
+                    offset_pose.pose.position.y,
+                    offset_pose.pose.position.z);
+
+        send_pose_goal(offset_pose, csv_file_, v_csv_file_);
+        rclcpp::sleep_for(2s);  // Wait for execution and TF update
+
+        RCLCPP_INFO(this->get_logger(), "Going home");
+
+        send_pose_goal(start_pose, csv_file_, v_csv_file_);  // Return to start
+        rclcpp::sleep_for(2s);
+
+        i++;
+      }
+
+      csv_file_.close();
+      v_csv_file_.close();
       
-      geometry_msgs::msg::PoseStamped offset_pose = start_pose;
-      offset_pose.pose.position.x += disp[0];
-      offset_pose.pose.position.y += disp[1];
-      offset_pose.pose.position.z += disp[2];
-
-      RCLCPP_INFO(this->get_logger(), "Sending offset pose [%.6f, %.6f, %.6f]",
-                  offset_pose.pose.position.x,
-                  offset_pose.pose.position.y,
-                  offset_pose.pose.position.z);
-
-      send_pose_goal(offset_pose, csv_file_, v_csv_file_);
-      rclcpp::sleep_for(2s);  // Wait for execution and TF update
-
-      RCLCPP_INFO(this->get_logger(), "Going home");
-
-      send_pose_goal(start_pose, csv_file_, v_csv_file_);  // Return to start
-      rclcpp::sleep_for(2s);
-
-      i++;
+      trial++;
     }
-
-    csv_file_.close();
-    v_csv_file_.close();
   }
 
   void send_pose_goal(const geometry_msgs::msg::PoseStamped &pose, std::ofstream& log_file, std::ofstream& velocity_log_file) {
