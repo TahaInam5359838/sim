@@ -39,7 +39,7 @@ public:
     auto goal_msg = MoveGroup::Goal();
     goal_msg.request.group_name = "tm12S_planninggroup";
     goal_msg.request.max_velocity_scaling_factor = 1.0;
-    goal_msg.request.max_acceleration_scaling_factor = 1.0;
+    goal_msg.request.max_acceleration_scaling_factor = acc_factor;
     goal_msg.request.pipeline_id = "pilz_industrial_motion_planner";
     goal_msg.request.planner_id = "LIN";
     goal_msg.request.num_planning_attempts = 10;
@@ -51,7 +51,7 @@ public:
     moveit_msgs::msg::OrientationConstraint ori_constraint  ;
   
     pos_constraint.header.frame_id = "link_0";
-    pos_constraint.link_name = "flange";
+    pos_constraint.link_name = "link_6";
     pos_constraint.constraint_region.primitives.resize(1);
     pos_constraint.constraint_region.primitives[0].type = shape_msgs::msg::SolidPrimitive::BOX;
     pos_constraint.constraint_region.primitives[0].dimensions = {0.001, 0.001, 0.001};
@@ -59,7 +59,7 @@ public:
     pos_constraint.weight = 1.0;
   
     ori_constraint.header.frame_id = "link_0";
-    ori_constraint.link_name = "flange";
+    ori_constraint.link_name = "link_6";
     ori_constraint.orientation = pose.pose.orientation;
     ori_constraint.absolute_x_axis_tolerance = 0.01;
     ori_constraint.absolute_y_axis_tolerance = 0.01;
@@ -114,7 +114,8 @@ public:
 
   void monitor_velocity_during_motion(const std::string &from_frame, const std::string &to_frame, std::ofstream& log_file)
   {
-    rclcpp::Duration sample_interval = rclcpp::Duration::from_seconds(0.1);  // 10 Hz sampling
+    rclcpp::Duration sample_interval = rclcpp::Duration::from_seconds(0.01);  // 100 Hz sampling
+    rclcpp::Time start_time = this->now();  // Store start time once
 
     {
       std::lock_guard<std::mutex> lock(file_mutex_);
@@ -127,7 +128,9 @@ public:
         if (motion_done_flag_) break;
       }
 
+      // inside loop:
       rclcpp::Time now = this->now();
+      double relative_time = (now - start_time).seconds();
       rclcpp::Time past_time = now - sample_interval;
 
       if (!tf_buffer_->canTransform(from_frame, to_frame, past_time, tf2::durationFromSec(0.1)) ||
@@ -147,7 +150,7 @@ public:
 
       double dt = (now - past_time).seconds();
       if (dt <= 0.0) {
-        rclcpp::sleep_for(100ms);
+        rclcpp::sleep_for(10ms);
         continue;
       }
 
@@ -162,10 +165,10 @@ public:
 
       if (v_mag > 1e-6) {
         std::lock_guard<std::mutex> lock(file_mutex_);
-        log_file << now.seconds() << "," << vx << "," << vy << "," << vz << "," << v_mag << "\n";
+        log_file << relative_time << "," << vx << "," << vy << "," << vz << "," << v_mag << "\n";
       }
 
-      rclcpp::sleep_for(100ms);
+      rclcpp::sleep_for(10ms);
     }
   }
 
@@ -175,63 +178,71 @@ public:
       RCLCPP_ERROR(get_logger(), "move_group action server not available.");
       return;
     }
-
+  
     rclcpp::sleep_for(500ms);
-
+  
     geometry_msgs::msg::PoseStamped start_pose = get_start_pose();
-
-    double rad = 200; // mm
-    rad /= 1000; // convert to meters
-
-    double speed = 0.15;
-    int trial = 1;
-
-    while (trial < 4) {
-
-      std::vector<std::vector<double>> displacements = get_spherical_path(rad);
-
-      std::ostringstream csv_name;
-      csv_name << "results_" << rad << "_" << speed << "_" << trial << ".csv";
-      csv_file_.open(csv_name.str());
-      csv_file_ << "desired_x,desired_y,desired_z,"
-                << "actual_x,actual_y,actual_z,"
-                << "error_x,error_y,error_z,time\n";  
-
-      std::ostringstream v_csv_name;
-      v_csv_name << "v_results_" << rad << "_" << speed << "_" << trial << ".csv";
-      v_csv_file_.open(v_csv_name.str());
-
-      int i = 0;
-      for (const auto& disp : displacements) {
-        RCLCPP_INFO(this->get_logger(), "Sending pose %d", i);
+  
+    std::vector<double> v_rad = {10, 100, 200};          // in mm
+    std::vector<double> v_acc_factor = {1.0, 0.5, 0.2};  // scaling factors
+  
+    for (double rad_mm : v_rad) {
+      double rad = rad_mm / 1000.0;  // convert mm to meters
+  
+      for (double l_acc_factor : v_acc_factor) {
+        acc_factor = l_acc_factor;
         
-        geometry_msgs::msg::PoseStamped offset_pose = start_pose;
-        offset_pose.pose.position.x += disp[0];
-        offset_pose.pose.position.y += disp[1];
-        offset_pose.pose.position.z += disp[2];
+        double acceleration = 0.25 * l_acc_factor;
+  
+        for (int trial = 1; trial <= 3; ++trial) {
 
-        RCLCPP_INFO(this->get_logger(), "Sending offset pose [%.6f, %.6f, %.6f]",
-                    offset_pose.pose.position.x,
-                    offset_pose.pose.position.y,
-                    offset_pose.pose.position.z);
+          std::vector<std::vector<double>> displacements = get_spherical_path(rad);
+  
+          std::ostringstream csv_name;
+          csv_name << "results_" << rad_mm << "_" << acceleration << "ms-2_" << trial << ".csv";
+          csv_file_.open(csv_name.str());
+          csv_file_ << "desired_x,desired_y,desired_z,"
+                    << "actual_x,actual_y,actual_z,"
+                    << "error_x,error_y,error_z,time\n";
+  
+          std::ostringstream v_csv_name;
+          v_csv_name << "v_results_" << rad_mm << "_" << acceleration << "ms-2_" << trial << ".csv";
+          v_csv_file_.open(v_csv_name.str());
 
-        send_pose_goal(offset_pose, csv_file_, v_csv_file_);
-        rclcpp::sleep_for(2s);  // Wait for execution and TF update
-
-        RCLCPP_INFO(this->get_logger(), "Going home");
-
-        send_pose_goal(start_pose, csv_file_, v_csv_file_);  // Return to start
-        rclcpp::sleep_for(2s);
-
-        i++;
+          RCLCPP_INFO(this->get_logger(), "Starting %s", csv_name.str().c_str());
+  
+          int i = 0;
+          for (const auto& disp : displacements) {
+            RCLCPP_INFO(this->get_logger(), "Sending pose %d", i);
+  
+            geometry_msgs::msg::PoseStamped offset_pose = start_pose;
+            offset_pose.pose.position.x += disp[0];
+            offset_pose.pose.position.y += disp[1];
+            offset_pose.pose.position.z += disp[2];
+  
+            RCLCPP_INFO(this->get_logger(), "Sending offset pose [%.6f, %.6f, %.6f]",
+                        offset_pose.pose.position.x,
+                        offset_pose.pose.position.y,
+                        offset_pose.pose.position.z);
+  
+            send_pose_goal(offset_pose, csv_file_, v_csv_file_);
+            rclcpp::sleep_for(2s);
+  
+            RCLCPP_INFO(this->get_logger(), "Going home");
+  
+            send_pose_goal(start_pose, csv_file_, v_csv_file_);
+            rclcpp::sleep_for(2s);
+  
+            i++;
+          }
+  
+          csv_file_.close();
+          v_csv_file_.close();
+        }
       }
-
-      csv_file_.close();
-      v_csv_file_.close();
-      
-      trial++;
     }
   }
+  
 
   void send_pose_goal(const geometry_msgs::msg::PoseStamped &pose, std::ofstream& log_file, std::ofstream& velocity_log_file) {
     moveit_msgs::action::MoveGroup::Goal goal_msg = create_goal(pose);  
@@ -258,7 +269,7 @@ public:
 
     // Start velocity monitoring thread, pass velocity_log_file
     std::thread velocity_logger_thread(&CartesianPoseClient::monitor_velocity_during_motion, this,
-                                       "link_0", "flange", std::ref(velocity_log_file));
+                                       "link_0", "link_6", std::ref(velocity_log_file));
   
     auto result_future = client_->async_get_result(goal_handle);
     if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), result_future) !=
@@ -292,7 +303,7 @@ public:
 
     try {
       std::string from_frame = "link_0";
-      std::string to_frame = "flange";
+      std::string to_frame = "link_6";
       if (!tf_buffer_->canTransform(from_frame, to_frame, tf2::TimePointZero, tf2::durationFromSec(2.0))) {
         RCLCPP_WARN(this->get_logger(), "Transform %s -> %s not available.", from_frame.c_str(), to_frame.c_str());
         return;
@@ -332,6 +343,8 @@ private:
   bool motion_done_flag_ = false;
   std::mutex motion_mutex_;
   std::mutex file_mutex_;
+
+  double acc_factor = 1.0;
 };
 
 int main(int argc, char ** argv)
